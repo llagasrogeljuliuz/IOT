@@ -16,13 +16,35 @@ document.addEventListener('DOMContentLoaded', () => {
         onFailure: (err) => console.error("Connection failed", err)
     });
 
+    // Listen for incoming messages
     client.onMessageArrived = function (message) {
         console.log("Received:", message.payloadString);
+        updateAllDevicesState(message.payloadString);  // Update all devices when a new message arrives
     };
 
     function onConnect() {
         console.log("Connected!");
         client.subscribe("my/test/topic");
+    }
+
+    // Function to update state for all devices
+    function updateAllDevicesState(state) {
+        // Find all devices (elements with data-device attribute)
+        const deviceBoxes = document.querySelectorAll('[data-device]');
+
+        deviceBoxes.forEach(deviceBox => {
+            const indicator = deviceBox.querySelector('.indicator');
+            const status = deviceBox.querySelector('.status');
+            
+            // Update the state for each device based on the received payload
+            if (state === 'On') {
+                indicator.classList.add('on');
+                status.textContent = 'Device is ON';
+            } else {
+                indicator.classList.remove('on');
+                status.textContent = 'Device is OFF';
+            }
+        });
     }
 
     // Device button logic
@@ -52,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 message = `On`;
             }
 
-            client.send("my/test/topic", message);
+            client.send("my/test/topic", message); // Send updated state to the topic
             showNotification(message);
         });
     });
@@ -71,4 +93,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 });
-

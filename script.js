@@ -44,12 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 indicator.classList.remove('on');
                 status.textContent = 'Device is OFF';
                 button.textContent = 'Turn ON';
-                message = `${deviceName} turned OFF at ${currentTime}`;
+                message = `Off`;
             } else {
                 indicator.classList.add('on');
                 status.textContent = 'Device is ON';
                 button.textContent = 'Turn OFF';
-                message = `${deviceName} turned ON at ${currentTime}`;
+                message = `On`;
             }
 
             client.send("my/test/topic", message);
@@ -71,3 +71,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 });
+

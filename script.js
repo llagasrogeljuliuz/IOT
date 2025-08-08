@@ -18,13 +18,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen for incoming messages
     client.onMessageArrived = function (message) {
-        console.log("Received:", message.payloadString);
-        updateAllDevicesState(message.payloadString);  // Update all devices when a new message arrives
+        const payload = JSON.parse(message.payloadString);
+        console.log("Received:", payload);
+
+        const deviceId = payload.deviceId;
+        const state = payload.state;
+
+        updateDeviceState(deviceId, state);
     };
+
 
     function onConnect() {
         console.log("Connected!");
+        alert("Connected")
         client.subscribe("my/test/topic");
+    }
+
+    function updateDeviceState(deviceId, state) {
+        const deviceBox = document.querySelector(`[data-device="${deviceId}"]`);
+
+        if (deviceBox) {
+            const indicator = deviceBox.querySelector('.indicator');
+            const status = deviceBox.querySelector('.status');
+
+            // Update the device state visually
+            if (state === 'On') {
+                indicator.classList.add('on');
+                status.textContent = 'Device is ON';
+            } else if (state === 'Off') {
+                indicator.classList.remove('on');
+                status.textContent = 'Device is OFF';
+            }
+        }
     }
 
     // Function to update state for all devices
@@ -35,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         deviceBoxes.forEach(deviceBox => {
             const indicator = deviceBox.querySelector('.indicator');
             const status = deviceBox.querySelector('.status');
-            
+
             // Update the state for each device based on the received payload
             if (state === 'On') {
                 indicator.classList.add('on');
@@ -61,23 +86,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const isOn = indicator.classList.contains('on');
             const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             let message = '';
+            let mqtt_message = {};
 
             if (isOn) {
                 indicator.classList.remove('on');
                 status.textContent = 'Device is OFF';
                 button.textContent = 'Turn ON';
-                message = `Off`;
+                message = `${deviceName} is Off`;
+                mqtt_message = { "deviceId": deviceName, "state": "Off" };
             } else {
                 indicator.classList.add('on');
                 status.textContent = 'Device is ON';
                 button.textContent = 'Turn OFF';
-                message = `On`;
+                message = `${deviceName} is On`;
+                mqtt_message = { "deviceId": deviceName, "state": "On" };
             }
 
-            client.send("my/test/topic", message); // Send updated state to the topic
+            client.send("my/test/topic", JSON.stringify(mqtt_message)); // Send updated state to the topic
             showNotification(message);
         });
     });
+
 
     function showNotification(message) {
         notification.textContent = message;

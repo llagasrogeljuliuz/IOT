@@ -40,17 +40,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (deviceBox) {
             const indicator = deviceBox.querySelector('.indicator');
             const status = deviceBox.querySelector('.status');
+            const button = deviceBox.querySelector('.toggle-button');  // Access the button
 
             // Update the device state visually
             if (state === 'On') {
                 indicator.classList.add('on');
                 status.textContent = 'Device is ON';
+                button.textContent = 'Turn OFF';  // Update button text
             } else if (state === 'Off') {
                 indicator.classList.remove('on');
                 status.textContent = 'Device is OFF';
+                button.textContent = 'Turn ON';  // Update button text
             }
         }
     }
+
 
     // Function to update state for all devices
     function updateAllDevicesState(state) {
@@ -68,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 indicator.classList.remove('on');
                 status.textContent = 'Device is OFF';
+
             }
         });
     }
